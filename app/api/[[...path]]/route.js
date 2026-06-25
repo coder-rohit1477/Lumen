@@ -302,6 +302,93 @@ async function handler(request, { params }) {
       return ok(clean(users))
     }
 
+    // ---------- ADMIN ANALYTICS ----------
+    if (route === '/admin/analytics' && method === 'GET') {
+      if (!user || user.role !== 'admin') return err('Admin only', 403)
+      const now = new Date()
+      const d30 = new Date(now - 30 * 86400000)
+      const w12 = new Date(now - 84 * 86400000)
+      const m6 = new Date(now - 180 * 86400000)
+      const paid = await db.collection('orders').find({ paymentStatus: 'paid' }).toArray()
+      const totalRevenue = paid.reduce((a, o) => a + o.total, 0)
+      const dailySales = {}
+      const weeklySales = {}
+      const monthlySales = {}
+      for (const o of paid) {
+        const d = new Date(o.createdAt)
+        if (d >= d30) {
+          const key = d.toISOString().slice(0, 10)
+          dailySales[key] = (dailySales[key] || 0) + o.total
+        }
+        if (d >= w12) {
+          const weekStart = new Date(d)
+          weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+          const key = weekStart.toISOString().slice(0, 10)
+          weeklySales[key] = (weeklySales[key] || 0) + o.total
+        }
+        if (d >= m6) {
+          const key = d.toISOString().slice(0, 7)
+          monthlySales[key] = (monthlySales[key] || 0) + o.total
+        }
+      }
+      const prodQty = {}
+      const allOrders = await db.collection('orders').find({}).toArray()
+      for (const o of allOrders) for (const it of (o.items || [])) prodQty[it.name || it.productId] = (prodQty[it.name || it.productId] || 0) + it.qty
+      const topProducts = Object.entries(prodQty).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, qty]) => ({ name, qty }))
+      const catRev = {}
+      const products = await db.collection('products').find({}).toArray()
+      const prodMap = new Map(products.map(p => [p.id, p]))
+      for (const o of paid) for (const it of (o.items || [])) {
+        const p = prodMap.get(it.productId)
+        const cat = p?.category || 'Uncategorized'
+        catRev[cat] = (catRev[cat] || 0) + it.price * it.qty
+      }
+      const categoryPerformance = Object.entries(catRev).map(([category, revenue]) => ({ category, revenue }))
+      return ok({
+        dailySales: Object.entries(dailySales).sort().map(([date, total]) => ({ date, total })),
+        weeklySales: Object.entries(weeklySales).sort().map(([week, total]) => ({ week, total })),
+        monthlySales: Object.entries(monthlySales).sort().map(([month, total]) => ({ month, total })),
+        topProducts, categoryPerformance, totalRevenue
+      })
+    }
+
+    // ---------- ADMIN CUSTOMERS ----------
+    if (route === '/admin/customers' && method === 'GET') {
+      if (!user || user.role !== 'admin') return err('Admin only', 403)
+      const users = await db.collection('users').find({}).toArray()
+      const orders = await db.collection('orders').find({}).toArray()
+      const byUser = {}
+      for (const o of orders) {
+        const uid = o.userId || o.userEmail
+        if (!byUser[uid]) byUser[uid] = { count: 0, total: 0 }
+        byUser[uid].count++
+        byUser[uid].total += o.total || 0
+      }
+      const result = users.map(u => {
+        const stats = byUser[u.id] || byUser[u.email] || { count: 0, total: 0 }
+        return { ...clean(u), totalOrders: stats.count, totalSpending: stats.total }
+      })
+      return ok(result)
+    }
+
+    // ---------- ADMIN INVENTORY ----------
+    if (route === '/admin/inventory' && method === 'GET') {
+      if (!user || user.role !== 'admin') return err('Admin only', 403)
+      const products = await db.collection('products').find({}).toArray()
+      const lowStock = clean(products.filter(p => p.stock > 0 && p.stock <= 10))
+      const outOfStock = clean(products.filter(p => (p.stock || 0) <= 0))
+      const totalItems = products.reduce((a, p) => a + (p.stock || 0), 0)
+      return ok({ lowStock, outOfStock, totalItems })
+    }
+
+    // ---------- ADMIN PAYMENTS ----------
+    if (route === '/admin/payments' && method === 'GET') {
+      if (!user || user.role !== 'admin') return err('Admin only', 403)
+      const orders = await db.collection('orders').find({ paymentStatus: { $exists: true } }).sort({ createdAt: -1 }).toArray()
+      const result = orders.map(o => ({ id: o.id, userEmail: o.userEmail, total: o.total, paymentStatus: o.paymentStatus, paymentMethod: o.paymentMethod, razorpayPaymentId: o.razorpayPaymentId, createdAt: o.createdAt }))
+      return ok(result)
+    }
+
     return err(`Route ${route} not found`, 404)
   } catch (e) {
     if (e?.code === 'ENV_MISSING' || e?.code === 'MONGO_URL_INVALID' || e?.code === 'MONGO_CONNECTION_FAILED') {
