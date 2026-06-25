@@ -1,86 +1,133 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# IDE and editors
-.idea/
-.vscode/
-
+# ============================================
 # Dependencies
+# ============================================
 node_modules/
-/node_modules
-/.pnp
+.pnp
 .pnp.js
-.yarn/install-state.gz
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
-next-env.d.ts
-*.tsbuildinfo
-
-# Production builds
-/build
-dist/
-dist
-
-# Environment files (comprehensive coverage)
-.env
-.env.local
-.env.*.local
-*token.json*
-*credentials.json*
-
-# Logs and debug files
+.yarn/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-dump.rdb
+pnpm-debug.log*
 
-# System files
+# ============================================
+# Next.js
+# ============================================
+.next/
+out/
+
+# ============================================
+# Build Output
+# ============================================
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# ============================================
+# Environment Variables
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Keep only template
+!.env.example
+
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+build.log
+
+# ============================================
+# Debug Files
+# ============================================
+dev_*
+test_result
+*.tmp
+*.temp
+
+# ============================================
+# IDE
+# ============================================
+.vscode/
+.idea/
+
+# ============================================
+# Operating System
+# ============================================
 .DS_Store
-*.pem
+Thumbs.db
+Desktop.ini
 
-# Python
-__pycache__/
-*pyc*
-venv/
-.venv/
+# ============================================
+# Vercel
+# ============================================
+.vercel/
 
-# Development tools
-chainlit.md
-.chainlit
-.ipynb_checkpoints/
-.ac
-
-# Deployment
-.vercel
-
-# Data and databases
-agenthub/agents/youtube/db
-
-# Archive files and large assets
-**/*.zip
-**/*.tar.gz
-**/*.tar
-**/*.tgz
-*.pack
-*.deb
-*.dylib
-
-# Build caches
+# ============================================
+# Cache
+# ============================================
 .cache/
+.turbo/
 
-memory/test_credentials.md
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.pyc
+.venv/
+venv/
 
-# Mobile development
-android-sdk/node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
-node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
-node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
+# ============================================
+# Emergent Metadata
+# ============================================
+.emergent/
+
+# ============================================
+# Archives
+# ============================================
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# ============================================
+# Secrets
+# ============================================
+*credentials.json*
+*token.json*
+*.pem
+*.key
+
+# ============================================
+# Optional MongoDB Local Files
+# ============================================
+*.mongodb
+
+# ============================================
+# Misc
+# ============================================
+chainlit.md
+.chainlit/
+.ipynb_checkpoints/
+
+# ============================================
+# Keep Required Project Files
+# ============================================
+!README.md
+!package.json
+!package-lock.json
+!next.config.js
+!tailwind.config.js
+!postcss.config.js
+!tsconfig.json
+!eslint.config.mjs
+!components.json
+!jsconfig.json
+!instrumentation.js
+!next-env.d.ts
