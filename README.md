@@ -394,7 +394,6 @@ MIT
 
 ## Author
 
-_Your Name_
+Rohit Kumar Yadav
 
-- GitHub: _your-github_
-- Email: _your-email_
+
