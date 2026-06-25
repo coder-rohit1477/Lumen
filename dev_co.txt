@@ -1,0 +1,13 @@
+   [1m[38;2;173;127;168m▲ Next.js 15.5.16[39m[22m
+   - Local:        http://localhost:3000
+   - Network:      http://0.0.0.0:3000
+   - Environments: .env.local
+
+ [32m[1m✓[22m[39m Starting...
+ [37m[1m○[22m[39m Compiling /instrumentation ...
+ [32m[1m✓[22m[39m Compiled /instrumentation in 972ms (22 modules)
+ [32m[1m✓[22m[39m Ready in 10.9s
+ [37m[1m○[22m[39m Compiling /api/[[...path]] ...
+ [32m[1m✓[22m[39m Compiled /api/[[...path]] in 3.8s (486 modules)
+ POST /api/orders [32m200[39m in 11456ms
+ GET /api/products?limit=1 [32m200[39m in 135ms

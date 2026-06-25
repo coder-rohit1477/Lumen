@@ -1,0 +1,9 @@
+
+> nextjs-mongo-template@0.1.0 build
+> node scripts/run-next.mjs build
+
+[startup] MONGO_URL is not set. The app will start with the bundled catalog preview, and live API requests will remain offline until you create .env.local.
+[startup] DB_NAME is not set. The default database name lumen_commerce will be used.
+[startup] JWT_SECRET is not set. Development auth falls back to a local secret, but production sign-in will fail until you set it.
+   ▲ Next.js 15.5.16
+
